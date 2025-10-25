@@ -308,8 +308,8 @@ export default function VideoBoardSync({
   return (
     <div className="w-full min-h-screen bg-gray-900 p-4">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold text-white mb-8 text-center">
-          Video Board Sync
+        <h1 className="text-xl font-bold text-white mb-8 text-center">
+          Video x Board Sync Demo
         </h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
@@ -338,9 +338,6 @@ export default function VideoBoardSync({
           {/* Chess Board - Second on mobile, first on desktop */}
           <div className="w-full lg:order-1">
             <div className="bg-gray-800 rounded-lg p-6 shadow-2xl">
-              <div className="mb-2 text-xs text-gray-500 font-mono break-all">
-                FEN: {currentFen.substring(0, 50)}...
-              </div>
               <div 
                 ref={boardContainerRef} 
                 style={{ width: '100%', maxWidth: '600px' }}
