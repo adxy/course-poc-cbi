@@ -306,15 +306,15 @@ export default function VideoBoardSync({
   }
 
   return (
-    <div className="w-full min-h-screen bg-gray-900 p-8">
+    <div className="w-full min-h-screen bg-gray-900 p-4">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold text-white mb-8 text-center">
           Video Board Sync
         </h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-          {/* YouTube Video */}
-          <div className="w-full">
+          {/* YouTube Video - First on mobile, second on desktop */}
+          <div className="w-full lg:order-2">
             <div className="aspect-video bg-black rounded-lg overflow-hidden shadow-2xl">
               <YouTube
                 videoId={videoId}
@@ -333,37 +333,10 @@ export default function VideoBoardSync({
                 className="w-full h-full"
               />
             </div>
-            
-            {/* Time display & Debug Panel */}
-            <div className="mt-4 bg-gray-800 rounded-lg p-4">
-              <p className="text-white text-sm">
-                <span className="font-semibold">Current Time:</span>{" "}
-                {currentTime.toFixed(2)}s
-              </p>
-              <p className="text-gray-400 text-xs mt-1">
-                Status: {isPlaying ? "Playing ▶" : "Paused ⏸"}
-              </p>
-              <div className="mt-3 pt-3 border-t border-gray-700">
-                <p className="text-xs text-gray-500 mb-1">Debug Info:</p>
-                <p className="text-xs text-gray-400">
-                  Video ID: {videoId}
-                </p>
-                <p className="text-xs text-gray-400">
-                  Next move at: {moves.length > 0 && currentTime < moves[0].timestamp 
-                    ? `${moves[0].timestamp.toFixed(2)}s (${moves[0].san})`
-                    : moves.length > 0 
-                    ? moves.find(m => m.timestamp > currentTime)?.timestamp.toFixed(2) + 's' 
-                    : 'N/A'}
-                </p>
-                <p className="text-xs text-gray-400">
-                  Player ready: {playerReady ? '✓' : '✗'}
-                </p>
-              </div>
-            </div>
           </div>
 
-          {/* Chess Board */}
-          <div className="w-full">
+          {/* Chess Board - Second on mobile, first on desktop */}
+          <div className="w-full lg:order-1">
             <div className="bg-gray-800 rounded-lg p-6 shadow-2xl">
               <div className="mb-2 text-xs text-gray-500 font-mono break-all">
                 FEN: {currentFen.substring(0, 50)}...
@@ -412,47 +385,6 @@ export default function VideoBoardSync({
                 )}
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Event Timeline Preview */}
-        <div className="mt-8 bg-gray-800 rounded-lg p-6">
-          <h2 className="text-2xl font-semibold text-white mb-4">
-            Event Timeline
-          </h2>
-          <div className="space-y-2 max-h-64 overflow-y-auto">
-            {events.slice(0, 10).map((event) => {
-              const time = event.type === "move" || event.type === "position" 
-                ? event.timestamp 
-                : event.start;
-              const isPast = time <= currentTime;
-              
-              return (
-                <div
-                  key={event.id}
-                  className={`p-3 rounded ${
-                    isPast ? "bg-green-900" : "bg-gray-700"
-                  } transition-colors`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-white font-medium">
-                      {event.type === "move" && `Move: ${event.san}`}
-                      {event.type === "position" && `Position: ${event.fen.substring(0, 20)}...`}
-                      {event.type === "highlight" && `Highlight: ${event.square}`}
-                      {event.type === "arrow" && `Arrow: ${event.from}→${event.to}`}
-                    </span>
-                    <span className="text-gray-400 text-sm">
-                      {time.toFixed(2)}s
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-            {events.length > 10 && (
-              <p className="text-gray-500 text-center text-sm">
-                ... and {events.length - 10} more events
-              </p>
-            )}
           </div>
         </div>
       </div>
