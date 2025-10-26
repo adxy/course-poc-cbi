@@ -10,6 +10,7 @@
 import { Chess } from 'chess.js';
 import * as fs from 'fs';
 import * as path from 'path';
+import { ChessEvent } from '@/types/events';
 
 interface MoveInput {
   timestamp: number;
@@ -31,7 +32,7 @@ function generateEvents(
   annotations: AnnotationInput[] = []
 ) {
   const chess = new Chess();
-  const events: any[] = [];
+  const events: ChessEvent[] = [];
 
   // Generate move events
   for (let i = 0; i < moves.length; i++) {

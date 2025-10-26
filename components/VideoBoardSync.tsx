@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import YouTube, { YouTubeProps } from "react-youtube";
+import styled from 'styled-components';
+import { Container, Title, Flex, Text, Center } from '@mantine/core';
 // @ts-expect-error - cm-chessboard doesn't have types
 import { Chessboard } from "cm-chessboard/src/Chessboard.js";
 // @ts-expect-error - cm-chessboard extensions don't have types
@@ -16,7 +18,6 @@ import {
   VideoBoardSyncProps,
   MoveEvent,
   ArrowEvent,
-  PositionEvent,
 } from "@/types/events";
 import {
   findLatestMoveIndex,
@@ -28,6 +29,35 @@ import {
 
 const STARTING_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 const SYNC_INTERVAL_MS = 200; // Poll every 200ms for smooth updates
+
+// Styled Components
+const VideoContainer = styled.div`
+  aspect-ratio: 16/9;
+  position: relative;
+  width: 100%;
+  height: 100%;
+`;
+
+const BoardContainer = styled.div`
+  width: 100%;
+  max-width: 800px;
+`;
+
+const ResponsivePaper = styled.div<{ $order: { base: number; lg: number } }>`
+  overflow: hidden;
+  flex: 1 1 400px;
+  min-width: 300px;
+  border-radius: 0.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  
+  @media (max-width: 1023px) {
+    order: ${props => props.$order.base};
+  }
+  
+  @media (min-width: 1024px) {
+    order: ${props => props.$order.lg};
+  }
+`;
 
 // Define YouTubePlayer type
 type YouTubePlayer = {
@@ -43,7 +73,7 @@ export default function VideoBoardSync({
   // YouTube player reference
   const playerRef = useRef<YouTubePlayer | null>(null);
   const syncIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const [playerReady, setPlayerReady] = useState<boolean>(false);
+  const [, setPlayerReady] = useState<boolean>(false);
 
   // Chessboard reference
   const boardContainerRef = useRef<HTMLDivElement | null>(null);
@@ -51,11 +81,11 @@ export default function VideoBoardSync({
 
   // State
   const [currentFen, setCurrentFen] = useState<string>(initialFen);
-  const [currentTime, setCurrentTime] = useState<number>(0);
+  const [, setCurrentTime] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [activeHighlights, setActiveHighlights] = useState<Set<string>>(new Set());
   const [activeArrows, setActiveArrows] = useState<ArrowEvent[]>([]);
-  const [lastMove, setLastMove] = useState<MoveEvent | null>(null);
+  const [, setLastMove] = useState<MoveEvent | null>(null);
   
   // Categorized events (memoized to avoid re-sorting on every render)
   const { moves, positions, highlights, arrows } = useMemo(() => categorizeEvents(events), [events]);
@@ -299,23 +329,26 @@ export default function VideoBoardSync({
 
   if (!videoId) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-red-500 text-xl">Invalid YouTube URL</p>
-      </div>
+      <Center h="100vh">
+        <Text c="red" size="xl">Invalid YouTube URL</Text>
+      </Center>
     );
   }
 
   return (
-    <div className="w-full min-h-screen bg-gray-900 p-4">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-xl font-bold text-white mb-8 text-center">
-          Video x Board Sync Demo
-        </h1>
+    <Container fluid p='xs' bg="dark.8" style={{ minHeight: '100vh' }}>
+      <Container size="xl">
+        <Title order={1} size="h4" ta="center" mb="xl" c="white">
+          Mating the King - Two Rooks
+        </Title>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-          {/* YouTube Video - First on mobile, second on desktop */}
-          <div className="w-full lg:order-2">
-            <div className="aspect-video bg-black rounded-lg overflow-hidden shadow-2xl">
+        <Flex gap="md" wrap="wrap" align="flex-start" direction='row'>
+          {/* YouTube Video - first on mobile, right on desktop */}
+          <ResponsivePaper 
+            $order={{ base: 1, lg: 2 }}
+            style={{ backgroundColor: 'black' }}
+          >
+            <VideoContainer>
               <YouTube
                 videoId={videoId}
                 opts={{
@@ -330,61 +363,20 @@ export default function VideoBoardSync({
                 onReady={onReady}
                 onStateChange={onStateChange}
                 onPlaybackRateChange={onPlaybackRateChange}
-                className="w-full h-full"
+                style={{ width: '100%', height: '100%' }}
               />
-            </div>
-          </div>
-
-          {/* Chess Board - Second on mobile, first on desktop */}
-          <div className="w-full lg:order-1">
-            <div className="bg-gray-800 rounded-lg p-6 shadow-2xl">
-              <div 
-                ref={boardContainerRef} 
-                style={{ width: '100%', maxWidth: '600px' }}
-              />
-              
-              {/* Board info */}
-              <div className="mt-4 space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-400">Active Highlights:</span>
-                  <span className="text-yellow-400 font-semibold">
-                    {activeHighlights.size}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-400">Active Arrows:</span>
-                  <span className="text-red-400 font-semibold">
-                    {activeArrows.length}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-400">Total Moves:</span>
-                  <span className="text-green-400 font-semibold">
-                    {moves.length}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-400">Current Move Index:</span>
-                  <span className="text-blue-400 font-semibold">
-                    {findLatestMoveIndex(moves, currentTime)}
-                  </span>
-                </div>
-                {lastMove && (
-                  <div className="mt-3 pt-3 border-t border-gray-700">
-                    <p className="text-xs text-gray-500 mb-1">Last Move:</p>
-                    <p className="text-white font-mono text-lg">
-                      {lastMove.san}
-                    </p>
-                    <p className="text-gray-400 text-xs">
-                      {lastMove.from} → {lastMove.to} at {lastMove.timestamp.toFixed(2)}s
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+            </VideoContainer>
+          </ResponsivePaper>
+          
+          {/* Chessboard - second on mobile, left on desktop */}
+          <ResponsivePaper 
+            $order={{ base: 2, lg: 1 }}
+            style={{ backgroundColor: 'var(--mantine-color-dark-8)' }}
+          >
+            <BoardContainer ref={boardContainerRef} />
+          </ResponsivePaper>
+        </Flex>
+      </Container>
+    </Container>
   );
 }

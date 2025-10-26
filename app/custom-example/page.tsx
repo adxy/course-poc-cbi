@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Paper, Title, Text } from '@mantine/core';
 import VideoBoardSync from "@/components/VideoBoardSync";
 import { ChessEvent } from "@/types/events";
 
@@ -161,12 +162,12 @@ export default function CustomExamplePage() {
 
   return (
     <div>
-      <div className="bg-blue-600 text-white p-4 text-center">
-        <h2 className="text-2xl font-bold">Custom Example: Scholar&apos;s Mate</h2>
-        <p className="text-sm mt-1">
+      <Paper bg="blue" c="white" p="md" ta="center">
+        <Title order={2} size="h2">Custom Example: Scholar&apos;s Mate</Title>
+        <Text size="sm" mt="xs">
           This demonstrates how to create your own chess events with annotations
-        </p>
-      </div>
+        </Text>
+      </Paper>
       <VideoBoardSync videoUrl={videoUrl} events={customEvents} />
     </div>
   );
