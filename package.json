@@ -6,8 +6,7 @@
     "dev": "next dev -p 5454",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "generate-events": "ts-node scripts/generateEvents.ts"
+    "lint": "eslint"
   },
   "dependencies": {
     "@mantine/carousel": "^8.3.5",
