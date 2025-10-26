@@ -59,6 +59,29 @@ const ResponsivePaper = styled.div<{ $order: { base: number; lg: number } }>`
   }
 `;
 
+const TopBar = styled.div`
+  background-color: var(--mantine-color-dark-7);
+  height: 3rem;
+  width: 100%;
+`;
+
+const BottomBar = styled.div`
+  background-color: var(--mantine-color-dark-7);
+  height: 3rem;
+  width: 100%;    
+`;
+
+const ContentContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100svh;
+  max-width: 1200px;
+  margin: 0 auto; 
+  padding: 0 1rem;
+  max-height: 100svh;
+`;
+
 // Define YouTubePlayer type
 type YouTubePlayer = {
   getCurrentTime: () => number;
@@ -336,11 +359,14 @@ export default function VideoBoardSync({
   }
 
   return (
-    <Container fluid p='xs' bg="dark.8" style={{ minHeight: '100vh' }}>
-      <Container size="xl">
-        <Title order={1} size="h4" ta="center" mb="xl" c="white">
-          Mating the King - Two Rooks
-        </Title>
+    <Container fluid p='xs' bg="dark.8" style={{ minHeight: '100svh', maxHeight: '100svh' }}>
+      <ContentContainer>
+      
+        <TopBar>
+          <Title order={1} size="h4" ta="center" mb="xl" c="white">
+            Mating the King - Two Rooks
+          </Title>
+        </TopBar>
         
         <Flex gap="md" wrap="wrap" align="flex-start" direction='row'>
           {/* YouTube Video - first on mobile, right on desktop */}
@@ -376,7 +402,12 @@ export default function VideoBoardSync({
             <BoardContainer ref={boardContainerRef} />
           </ResponsivePaper>
         </Flex>
-      </Container>
+        <BottomBar>
+          <Text c="white" size="sm" ta="center">
+            Mating the King - Two Rooks
+          </Text>
+        </BottomBar>
+        </ContentContainer>
     </Container>
   );
 }
